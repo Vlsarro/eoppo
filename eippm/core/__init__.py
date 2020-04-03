@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-__all__ = ('ImageProcessingModuleABC',)
+__all__ = ('ImageProcessingModuleABC', 'ImageProcessingModulesPipelineABC')
 
 
 class ImageProcessingModuleABC(ABC):
@@ -12,4 +12,11 @@ class ImageProcessingModuleABC(ABC):
 
     @abstractmethod
     def save(self):
+        pass
+
+
+class ImageProcessingModulesPipelineABC(ABC):
+
+    @abstractmethod
+    def run(self):
         pass
