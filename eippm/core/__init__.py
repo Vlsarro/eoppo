@@ -15,7 +15,7 @@ class ImageProcessingModuleABC(ABC):
         pass
 
     @abstractmethod
-    def save(self):
+    def save(self, filename: str):
         pass
 
     @abstractmethod

@@ -2,25 +2,34 @@ import pkg_resources
 from copy import deepcopy
 from eippm.logger import logger
 from eippm.core import ImageProcessingModuleABC
-from eippm.core.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
-                                   EIPPMDependenciesNotSatisfiedException)
 from eippm.core.mixin import ImageProcessingModuleMixin
+from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
+                              EIPPMDependenciesNotSatisfiedException, EIPPMSaveException)
 from eippm.utils.common import get_exc_data
+
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 
 class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
-    _pkgs = {}
+    _pkgs = {}  # TODO: make immutable after first assignment
 
     _default_settings = {}
     _dependencies = tuple()
 
     _dependencies_satisfied = None
+
+    _use_globals = False
     
     def __init__(self) -> None:
         super(BaseImageProcessingModule, self).__init__()
         self.settings = deepcopy(self._default_settings)
 
     def _initialize(self, **kwargs) -> None:
+        if self._use_globals:
+            self._pkgs = globals()
         self._initialized = True
 
     def initialize(self, **kwargs) -> None:
@@ -54,8 +63,17 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
             if self._dependencies:
                 try:
                     pkg_resources.require(self._dependencies)
-                except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict):
+                except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict) as e:
+                    logger.debug(f'Dependencies are not satisfied > {repr(e)}\n{get_exc_data()}')
                     self._dependencies_satisfied = False
                 finally:
                     return self._dependencies_satisfied
         return self._dependencies_satisfied
+
+    def save(self, filename: str):
+        try:
+            with open(filename, 'wb') as f:
+                pickle.dump(self, f)
+        except Exception as e:
+            logger.debug(f'Module saving exception > {repr(e)}\n{get_exc_data()}')
+            raise EIPPMSaveException(cause=e)

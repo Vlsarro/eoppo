@@ -1,5 +1,5 @@
 __all__ = ('EIPPMException', 'EIPPMDependenciesNotSatisfiedException', 'EIPPMInitializationException',
-           'EIPPMUnhandledException', 'EIPPMNotInitializedException')
+           'EIPPMUnhandledException', 'EIPPMNotInitializedException', 'EIPPMSaveException')
 
 
 class EIPPMException(Exception):
@@ -26,3 +26,7 @@ class EIPPMNotInitializedException(EIPPMException):
 
 class EIPPMUnhandledException(EIPPMException):
     code = '5'
+
+
+class EIPPMSaveException(EIPPMException):
+    code = '6'
