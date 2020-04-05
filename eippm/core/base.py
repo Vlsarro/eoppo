@@ -1,9 +1,11 @@
 import pkg_resources
 from copy import deepcopy
+from eippm.logger import logger
 from eippm.core import ImageProcessingModuleABC
 from eippm.core.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
                                    EIPPMDependenciesNotSatisfiedException)
 from eippm.core.mixin import ImageProcessingModuleMixin
+from eippm.utils.common import get_exc_data
 
 
 class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
@@ -27,6 +29,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                 try:
                     self._initialize(**kwargs)
                 except Exception as e:
+                    logger.debug(f'Initialization exception > {repr(e)}\n{get_exc_data()}')
                     raise EIPPMInitializationException(cause=e)
             else:
                 raise EIPPMDependenciesNotSatisfiedException()
@@ -41,6 +44,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
         try:
             return self._process(image, callback=callback, **kwargs)
         except Exception as e:
+            logger.debug(f'Processing exception > {repr(e)}\n{get_exc_data()}')
             raise EIPPMUnhandledException(cause=e)
 
     @property
