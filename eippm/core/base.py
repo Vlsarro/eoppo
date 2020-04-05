@@ -23,9 +23,10 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
 
     _use_globals = False
     
-    def __init__(self, auto_init=True, **kwargs) -> None:
+    def __init__(self, auto_init=True, ignore_processing_errors=False, **kwargs) -> None:
         super(BaseImageProcessingModule, self).__init__()
         self.settings = deepcopy(self._default_settings)
+        self.ignore_processing_errors = ignore_processing_errors
         if auto_init:
             self.initialize(**kwargs)
 
@@ -56,7 +57,10 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
             return self._process(image, callback=callback, **kwargs)
         except Exception as e:
             logger.debug(f'Processing exception > {repr(e)}\n{get_exc_data()}')
-            raise EIPPMUnhandledException(cause=e)
+            if self.ignore_processing_errors:
+                return image
+            else:
+                raise EIPPMUnhandledException(cause=e)
 
     @property
     def dependencies_satisfied(self) -> bool:
