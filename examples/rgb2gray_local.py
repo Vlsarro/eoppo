@@ -24,7 +24,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     rgb2gray = RGB2Gray()
-    rgb2gray.initialize()
 
     filename = 'rbg2gray'
 

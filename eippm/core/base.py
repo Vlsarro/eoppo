@@ -23,9 +23,11 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
 
     _use_globals = False
     
-    def __init__(self) -> None:
+    def __init__(self, auto_init=True) -> None:
         super(BaseImageProcessingModule, self).__init__()
         self.settings = deepcopy(self._default_settings)
+        if auto_init:
+            self.initialize()
 
     def _initialize(self, **kwargs) -> None:
         if self._use_globals:
