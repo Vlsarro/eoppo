@@ -7,7 +7,11 @@ __all__ = ('ImageProcessingModuleABC', 'ImageProcessingModulesPipelineABC')
 class ImageProcessingModuleABC(ABC):
 
     @abstractmethod
-    def process(self, image, callback=None):
+    def _process(self, image, callback=None, **kwargs):
+        pass
+
+    @abstractmethod
+    def process(self, image, callback=None, **kwargs):
         pass
 
     @abstractmethod
@@ -15,7 +19,11 @@ class ImageProcessingModuleABC(ABC):
         pass
 
     @abstractmethod
-    def initialize(self):
+    def _initialize(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def initialize(self, **kwargs):
         pass
 
 
