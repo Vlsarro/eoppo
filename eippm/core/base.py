@@ -1,6 +1,6 @@
 import pkg_resources
 from copy import deepcopy
-from typing import Callable
+from typing import Callable, Any
 from eippm.logger import logger
 from eippm.core import ImageProcessingModuleABC
 from eippm.core.mixin import ImageProcessingModuleMixin
@@ -29,26 +29,28 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
         if auto_init:
             self.initialize(**kwargs)
 
-    def _initialize(self, **kwargs) -> None:
+    def _initialize(self, **kwargs) -> __qualname__:
         if self._use_globals:
             self._pkgs = globals()
         self._initialized = True
+        return self
 
-    def initialize(self, **kwargs) -> None:
+    def initialize(self, **kwargs) -> __qualname__:
         if not self.is_initialized:
             if self.dependencies_satisfied:
                 try:
-                    self._initialize(**kwargs)
+                    return self._initialize(**kwargs)
                 except Exception as e:
                     logger.debug(f'Initialization exception > {repr(e)}\n{get_exc_data()}')
                     raise EIPPMInitializationException(cause=e)
             else:
                 raise EIPPMDependenciesNotSatisfiedException()
+        return self
 
-    def _process(self, image, callback: Callable = None, **kwargs):
+    def _process(self, image: Any, callback: Callable = None, **kwargs) -> Any:
         return image
 
-    def process(self, image, callback: Callable = None, **kwargs):
+    def process(self, image: Any, callback: Callable = None, **kwargs) -> Any:
         if not self.is_initialized:
             raise EIPPMNotInitializedException()
 
