@@ -17,21 +17,30 @@ class ImageProcessingModuleMixin:
     _version = tuple()
 
     @property
-    def is_initialized(self):
+    def is_initialized(self) -> bool:
         return self._initialized
 
     @property
-    def version(self):
+    def version(self) -> str:
         return get_version(self._version)
 
     @property
-    def name(self):
-        return f'{self.__class__.__name__}_v{self.version}'
+    def short_name(self) -> str:
+        return self.__class__.__name__
 
-    def save(self, filename: str) -> None:
+    @property
+    def full_name(self) -> str:
+        return f'{self.short_name} ({self.version})'
+
+    def save(self, filepath: str) -> __qualname__:
         try:
-            with open(filename, 'wb') as f:
+            with open(filepath, 'wb') as f:
                 pickle.dump(self, f)
         except Exception as e:
             logger.debug(f'Module saving exception > {repr(e)}\n{get_exc_data()}')
             raise EIPPMSaveException(cause=e)
+        else:
+            return self
+
+    def __repr__(self) -> str:
+        return f'{self.short_name}({hex(id(self))})'
