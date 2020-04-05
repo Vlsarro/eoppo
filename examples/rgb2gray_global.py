@@ -23,8 +23,8 @@ if __name__ == '__main__':
     with open(filename, 'rb') as f:
         loaded_rgb2gray = pickle.load(f)
 
-    lenna_img = np.asarray(Image.open('1.jpg'))
+    test_img = np.asarray(Image.open('1.jpg'))
 
-    data = loaded_rgb2gray.process(lenna_img)
-    lenna_img_grayscale = Image.fromarray(data)
-    lenna_img_grayscale.show()
+    data = loaded_rgb2gray.process(test_img)
+    test_img_grayscale = Image.fromarray(data)
+    test_img_grayscale.show()
