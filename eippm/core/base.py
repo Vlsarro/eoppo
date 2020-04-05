@@ -5,13 +5,11 @@ from eippm.logger import logger
 from eippm.core import ImageProcessingModuleABC
 from eippm.core.mixin import ImageProcessingModuleMixin
 from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
-                              EIPPMDependenciesNotSatisfiedException, EIPPMSaveException)
+                              EIPPMDependenciesNotSatisfiedException)
 from eippm.utils.common import get_exc_data
 
-try:
-    import cPickle as pickle
-except:
-    import pickle
+
+__all__ = ('BaseImageProcessingModule',)
 
 
 class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
@@ -76,11 +74,3 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                 finally:
                     return self._dependencies_satisfied
         return self._dependencies_satisfied
-
-    def save(self, filename: str) -> None:
-        try:
-            with open(filename, 'wb') as f:
-                pickle.dump(self, f)
-        except Exception as e:
-            logger.debug(f'Module saving exception > {repr(e)}\n{get_exc_data()}')
-            raise EIPPMSaveException(cause=e)

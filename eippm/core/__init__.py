@@ -15,10 +15,6 @@ class ImageProcessingModuleABC(ABC):
         pass
 
     @abstractmethod
-    def save(self, filename: str):
-        pass
-
-    @abstractmethod
     def _initialize(self, **kwargs):
         pass
 
