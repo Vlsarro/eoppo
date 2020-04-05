@@ -1,5 +1,6 @@
 import pkg_resources
 from copy import deepcopy
+from typing import Callable
 from eippm.logger import logger
 from eippm.core import ImageProcessingModuleABC
 from eippm.core.mixin import ImageProcessingModuleMixin
@@ -23,7 +24,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
 
     _use_globals = False
     
-    def __init__(self, auto_init=True, ignore_processing_errors=False, **kwargs) -> None:
+    def __init__(self, auto_init: bool = True, ignore_processing_errors: bool = False, **kwargs) -> None:
         super(BaseImageProcessingModule, self).__init__()
         self.settings = deepcopy(self._default_settings)
         self.ignore_processing_errors = ignore_processing_errors
@@ -46,10 +47,10 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
             else:
                 raise EIPPMDependenciesNotSatisfiedException()
 
-    def _process(self, image, callback=None, **kwargs):
+    def _process(self, image, callback: Callable = None, **kwargs):
         return image
 
-    def process(self, image, callback=None, **kwargs):
+    def process(self, image, callback: Callable = None, **kwargs):
         if not self.is_initialized:
             raise EIPPMNotInitializedException()
 
@@ -76,7 +77,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                     return self._dependencies_satisfied
         return self._dependencies_satisfied
 
-    def save(self, filename: str):
+    def save(self, filename: str) -> None:
         try:
             with open(filename, 'wb') as f:
                 pickle.dump(self, f)
