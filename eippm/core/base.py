@@ -1,5 +1,7 @@
-from eippm.core import ImageProcessingModuleABC
+from eippm.core import ImageProcessingModuleABC, ImageProcessingModuleMixin
 
 
-class BaseImageProcessingModule(ImageProcessingModuleABC):
-    pass
+class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
+
+    def initialize(self):
+        self._initialized = True
