@@ -7,12 +7,12 @@ from eippm.exceptions import EIPPMException
 EXAMPLES_DIR = os.path.dirname(__file__)
 
 
-class CatFilter(BaseImageProcessingModule):
+class MobilenetV2Classifier(BaseImageProcessingModule):
 
     _dependencies = ('torch==1.4.0', 'torchvision==0.5.0')
 
     def _initialize(self, device='cpu', **kwargs) -> None:
-        super(CatFilter, self)._initialize()
+        super(MobilenetV2Classifier, self)._initialize()
 
         import torch
         from torchvision import transforms
@@ -30,7 +30,9 @@ class CatFilter(BaseImageProcessingModule):
         ])
 
     def _process(self, image, callback=None, **kwargs):
-        output = self.model(self.transform(image).to(self.device))
+        tensor_img = self.transform(image)
+        tensor_img = tensor_img.unsqueeze(0)
+        output = self.model(tensor_img.to(self.device))
         label = self._pkgs['torch'].argmax(output, dim=1).cpu().numpy()
         if callback:
             callback(data=label)
@@ -42,16 +44,19 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.DEBUG)
 
-    cat_filter = CatFilter()
+    mobilenet_v2_classifier = MobilenetV2Classifier()
 
     test_img = Image.open(os.path.join(EXAMPLES_DIR, '1.jpg'))
 
+    result = []
+
     try:
-        out = cat_filter.process(image=test_img, callback=lambda **kwargs: print(kwargs))
+        out = mobilenet_v2_classifier.process(image=test_img, callback=lambda **kwargs: result.append(kwargs))
     except EIPPMException:
         logging.error('Error occured', exc_info=True)
 
-    cat_filter.ignore_processing_errors = True
-    cat_filter.process(image=test_img, callback=lambda **kwargs: print(kwargs)).show()
+    mobilenet_v2_classifier.ignore_processing_errors = True
+    mobilenet_v2_classifier.process(image=test_img, callback=lambda **kwargs: result.append(kwargs)).show()
 
     logging.info('Finished!')
+    logging.info(result)
