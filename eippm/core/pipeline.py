@@ -20,11 +20,10 @@ class ModuleCallParams(TypedDict):
 
 class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImageProcessingModuleMixin):
 
-    _modules = list()  # type: List[BaseImageProcessingModule]
-
     def __init__(self, modules: List[BaseImageProcessingModule] = None, ignore_processing_errors: bool = False) -> None:
         super(ImageProcessingModulesPipeline, self).__init__()
         self.ignore_processing_errors = ignore_processing_errors
+        self._modules = []  # type: List[BaseImageProcessingModule]
         if modules:
             self._modules.extend(modules)
 
