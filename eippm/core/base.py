@@ -9,7 +9,7 @@ from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledExcept
 from eippm.utils.common import get_exc_data
 
 
-__all__ = ('BaseImageProcessingModule',)
+__all__ = ('BaseImageProcessingModule', 'NoopImageProcessingModule')
 
 
 class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
@@ -49,10 +49,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                 raise EIPPMDependenciesNotSatisfiedException()
         return self
 
-    def _process(self, image: Any, callback: Callable = None, **kwargs) -> Any:
-        return image
-
-    def process(self, image: Any, callback: Callable = None, **kwargs) -> Any:
+    def process(self, image: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
         if not self.is_initialized:
             raise EIPPMNotInitializedException()
 
@@ -82,3 +79,8 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
     @property
     def is_initialized(self) -> bool:
         return self._initialized
+
+
+class NoopImageProcessingModule(BaseImageProcessingModule):
+    def _process(self, image: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
+        return image
