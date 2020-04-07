@@ -31,3 +31,8 @@ if __name__ == '__main__':
     data = loaded_rgb2gray.process(test_img)
     test_img_grayscale = Image.fromarray(data)
     test_img_grayscale.show()
+
+    try:
+        os.remove(img_processing_module_filepath)
+    except OSError:
+        pass
