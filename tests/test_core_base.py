@@ -1,12 +1,11 @@
-import os
-import pickle
 import pkg_resources
 from typing import Callable
-from unittest import TestCase, main, mock
+from unittest import main, mock
 
+from tests import EIPPMBaseTestCase
 from eippm.core.base import BaseImageProcessingModule
 from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
-                              EIPPMDependenciesNotSatisfiedException, EIPPMSaveException)
+                              EIPPMDependenciesNotSatisfiedException)
 
 
 sample_callback_data = {'a': 5, 'b': 4, 'data': {'a': 5}}
@@ -21,23 +20,14 @@ class TestImageProcessingModule(BaseImageProcessingModule):
         return image
 
 
-class BaseImageProcessingModuleTests(TestCase):
+class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
-    def setUp(self) -> None:
-        super(BaseImageProcessingModuleTests, self).setUp()
-        self.test_module_filepath = os.path.join(os.path.dirname(__file__), 'test_module')
-        self.test_dependencies = ('numpy', 'pillow')
-
-    def tearDown(self) -> None:
-        super(BaseImageProcessingModuleTests, self).tearDown()
-        try:
-            os.remove(self.test_module_filepath)
-        except OSError:
-            pass
+    def create_default_test_obj(self):
+        return TestImageProcessingModule(auto_init=False)
 
     @mock.patch('pkg_resources.require')
     def test_module_initialize(self, mock_require):
-        m = TestImageProcessingModule(auto_init=False)
+        m = self.create_default_test_obj()
         m._dependencies = self.test_dependencies
 
         mock_require.side_effect = [pkg_resources.VersionConflict(), True]
@@ -61,7 +51,7 @@ class BaseImageProcessingModuleTests(TestCase):
         self.assertTrue(m.is_initialized)
 
     def test_module_process(self):
-        m = TestImageProcessingModule(auto_init=False)
+        m = self.create_default_test_obj()
 
         test_arg = [1, 2, 3]
 
@@ -94,25 +84,8 @@ class BaseImageProcessingModuleTests(TestCase):
         self.assertEqual(1, len(callback_result))
         self.assertDictEqual(callback_result[0], sample_callback_data)
 
-    def test_module_save(self):
-        m = TestImageProcessingModule(auto_init=False)
-        m.save(self.test_module_filepath)
-
-        with open(self.test_module_filepath, 'rb') as f:
-            loaded_m = pickle.load(f)
-
-        self.assertEqual(m.__dict__, loaded_m.__dict__)
-
-        with mock.patch('pickle.dump') as mock_dump:
-            mock_dump.side_effect = [TypeError('err')]
-
-            with self.assertRaises(EIPPMSaveException) as cm:
-                m.save(self.test_module_filepath)
-
-            self.assertIsInstance(cm.exception.cause, TypeError)
-
     def test_module_mixin_props(self):
-        m = TestImageProcessingModule(auto_init=False)
+        m = self.create_default_test_obj()
 
         with mock.patch('pkg_resources.require') as mock_require:
             res = m.dependencies_satisfied
@@ -138,6 +111,9 @@ class BaseImageProcessingModuleTests(TestCase):
 
         m.initialize()
         self.assertTrue(m.is_initialized)
+
+    def test_save(self):
+        self._test_save()
 
 
 if __name__ == '__main__':
