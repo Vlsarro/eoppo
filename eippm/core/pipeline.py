@@ -1,4 +1,4 @@
-from typing import Any, List, Dict, TypedDict, Callable
+from typing import Any, List, Dict, TypedDict, Callable, Tuple
 
 from eippm.core import ImageProcessingModulesPipelineABC
 from eippm.core.base import BaseImageProcessingModule
@@ -14,6 +14,8 @@ __all__ = ('ImageProcessingModulesPipeline',)
 class ModuleCallParams(TypedDict):
     callback: Callable[..., None]
     params: Dict
+    exc_to_ignore: Tuple[Exception]
+    skip_error: bool
 
 
 class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImageProcessingModuleMixin):
@@ -37,8 +39,14 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
             for idx, m in enumerate(self._modules):
                 if call_params and idx in call_params:
                     m_call_params = call_params[idx]
-                    image = m.process(image, callback=m_call_params.get('callback'),
-                                      **m_call_params.get('params', {}))
+                    try:
+                        image = m.process(image, callback=m_call_params.get('callback'),
+                                          **m_call_params.get('params', {}))
+                    except m_call_params.get('exc_to_ignore'):
+                        pass
+                    except Exception:
+                        if not bool(m_call_params.get('skip_error')):
+                            raise
                 else:
                     image = m.process(image)
             return image
