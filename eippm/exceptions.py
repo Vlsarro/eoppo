@@ -1,5 +1,6 @@
 __all__ = ('EIPPMException', 'EIPPMDependenciesNotSatisfiedException', 'EIPPMInitializationException',
-           'EIPPMUnhandledException', 'EIPPMNotInitializedException', 'EIPPMSaveException')
+           'EIPPMUnhandledException', 'EIPPMNotInitializedException', 'EIPPMSaveException',
+           'EIPPMNoModulesInPipelineException')
 
 
 class EIPPMException(Exception):
@@ -30,3 +31,7 @@ class EIPPMUnhandledException(EIPPMException):
 
 class EIPPMSaveException(EIPPMException):
     code = '6'
+
+
+class EIPPMNoModulesInPipelineException(EIPPMException):
+    code = '7'

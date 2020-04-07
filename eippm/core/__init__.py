@@ -26,5 +26,5 @@ class ImageProcessingModuleABC(ABC):
 class ImageProcessingModulesPipelineABC(ABC):
 
     @abstractmethod
-    def run(self):
+    def run(self, image, call_params=None):
         pass
