@@ -21,6 +21,8 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
     _dependencies_satisfied = None
 
     _use_globals = False
+
+    _initialized = False
     
     def __init__(self, auto_init: bool = True, ignore_processing_errors: bool = False, **kwargs) -> None:
         super(BaseImageProcessingModule, self).__init__()
@@ -76,3 +78,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                 finally:
                     return self._dependencies_satisfied
         return self._dependencies_satisfied
+
+    @property
+    def is_initialized(self) -> bool:
+        return self._initialized

@@ -13,12 +13,7 @@ __all__ = ('ImageProcessingModuleMixin',)
 
 
 class ImageProcessingModuleMixin:
-    _initialized = False
     _version = tuple()
-
-    @property
-    def is_initialized(self) -> bool:
-        return self._initialized
 
     @property
     def version(self) -> str:
