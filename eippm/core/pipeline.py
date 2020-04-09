@@ -1,4 +1,4 @@
-from typing import Any, List, Dict, TypedDict, Callable, Tuple
+from typing import Any, List, Dict, TypedDict, Callable, Tuple, Union
 
 from eippm.core import ImageProcessingModulesPipelineABC, ImageProcessingModuleABC
 from eippm.core.base import BaseImageProcessingModule
@@ -14,7 +14,7 @@ __all__ = ('ImageProcessingModulesPipeline',)
 class ModuleCallParams(TypedDict):
     callback: Callable[..., None]
     params: Dict
-    exc_to_ignore: Tuple[Exception]
+    exc_to_ignore: Union[type, Tuple[Exception]]
     skip_error: bool
 
 
@@ -34,15 +34,14 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
         try:
             for idx, m in enumerate(self):
                 if call_params and idx in call_params:
-                    # TODO: add warning for idx miss, just try except with key error and warn in exc handler
                     m_call_params = call_params[idx]
                     try:
                         image = m.process(image, callback=m_call_params.get('callback'),
                                           **m_call_params.get('params', {}))
-                    except m_call_params.get('exc_to_ignore'):
-                        pass
-                    except Exception:
-                        if not bool(m_call_params.get('skip_error')):
+                    except EIPPMException as e:
+                        skip_err = bool(m_call_params.get('skip_error'))
+                        exc_to_ignore = m_call_params.get('exc_to_ignore') or tuple()
+                        if not (skip_err or isinstance(e.cause, exc_to_ignore)):
                             raise
                 else:
                     image = m.process(image)
@@ -76,7 +75,7 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
     @staticmethod
     def _check_item_type(v):
         if not isinstance(v, ImageProcessingModuleABC):
-            raise TypeError(v)
+            raise TypeError(f'{repr(v)} is not a subclass of {repr(ImageProcessingModuleABC)}')
 
     def __len__(self): return len(self._modules)
 
