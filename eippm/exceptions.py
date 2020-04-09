@@ -7,7 +7,7 @@ class EIPPMException(Exception):
     msg = 'Processing exception'
     code = '1'
 
-    def __init__(self, msg=None, cause=None):
+    def __init__(self, msg: str = None, cause: Exception = None):
         self.cause = cause
         msg = msg or self.msg
         super(EIPPMException, self).__init__(msg)
