@@ -37,6 +37,7 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
         try:
             for idx, m in enumerate(self._modules):
                 if call_params and idx in call_params:
+                    # TODO: add warning for idx miss, just try except with key error and warn in exc handler
                     m_call_params = call_params[idx]
                     try:
                         image = m.process(image, callback=m_call_params.get('callback'),
