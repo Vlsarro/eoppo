@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import MutableSequence
 
 
 __all__ = ('ImageProcessingModuleABC', 'ImageProcessingModulesPipelineABC')
@@ -23,7 +24,7 @@ class ImageProcessingModuleABC(ABC):
         pass
 
 
-class ImageProcessingModulesPipelineABC(ABC):
+class ImageProcessingModulesPipelineABC(MutableSequence):
 
     @abstractmethod
     def run(self, image, call_params=None):

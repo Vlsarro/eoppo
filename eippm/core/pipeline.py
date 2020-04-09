@@ -1,6 +1,6 @@
 from typing import Any, List, Dict, TypedDict, Callable, Tuple
 
-from eippm.core import ImageProcessingModulesPipelineABC
+from eippm.core import ImageProcessingModulesPipelineABC, ImageProcessingModuleABC
 from eippm.core.base import BaseImageProcessingModule
 from eippm.core.mixin import ImageProcessingModuleMixin
 from eippm.exceptions import EIPPMException, EIPPMUnhandledException, EIPPMNoModulesInPipelineException
@@ -25,17 +25,14 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
         self.ignore_processing_errors = ignore_processing_errors
         self._modules = []  # type: List[BaseImageProcessingModule]
         if modules:
-            self._modules.extend(modules)
-
-    def append(self, ip_module: BaseImageProcessingModule) -> None:
-        self._modules.append(ip_module)
+            self.extend(modules)
 
     def run(self, image: Any, call_params: Dict[int, ModuleCallParams] = None) -> Any:
         if not self._modules:
             raise EIPPMNoModulesInPipelineException()
 
         try:
-            for idx, m in enumerate(self._modules):
+            for idx, m in enumerate(self):
                 if call_params and idx in call_params:
                     # TODO: add warning for idx miss, just try except with key error and warn in exc handler
                     m_call_params = call_params[idx]
@@ -75,3 +72,25 @@ class ImageProcessingModulesPipeline(ImageProcessingModulesPipelineABC, ImagePro
             raise EIPPMNoModulesInPipelineException()
 
         return all([m.dependencies_satisfied for m in self._modules])
+
+    @staticmethod
+    def _check_item_type(v):
+        if not isinstance(v, ImageProcessingModuleABC):
+            raise TypeError(v)
+
+    def __len__(self): return len(self._modules)
+
+    def __getitem__(self, i): return self._modules[i]
+
+    def __delitem__(self, i): del self._modules[i]
+
+    def __setitem__(self, i, v):
+        self._check_item_type(v)
+        self._modules[i] = v
+
+    def insert(self, i, v):
+        self._check_item_type(v)
+        self._modules.insert(i, v)
+
+    def __str__(self):
+        return str(self._modules)
