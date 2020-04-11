@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import eippm
+import eoppo
 import os.path
 from setuptools import setup, find_packages
 
@@ -10,13 +10,13 @@ def read(fname):
 
 
 setup(
-    name='eippm',
-    version=eippm.__version__,
-    description='Library for creation of reusable and embeddable image processing python modules',
+    name='eoppo',
+    version=eoppo.__version__,
+    description='The Python micro library for building embeddable object operators as wrapper classes',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     author='Vlsarro',
-    url='https://github.com/Vlsarro/eippm',
+    url='https://github.com/Vlsarro/eoppo',
     packages=find_packages(),
     python_requires='>=3.6',
     extras_require={
