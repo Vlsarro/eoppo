@@ -1,69 +1,69 @@
 import pkg_resources
 from unittest import mock, main
-from typing import Callable, Any
+from typing import Callable
 
 from tests import EIPPMBaseTestCase
-from eippm.core.base import BaseImageProcessingModule
-from eippm.core.pipeline import ImageProcessingModulesPipeline
-from eippm.exceptions import EIPPMUnhandledException
+from eoppo.core.base import BaseObjectProcessingOperator
+from eoppo.core.pipeline import ObjectProcessingOperatorsPipeline
+from eoppo.exceptions import ObjectProcessingError
 
 
-class TestModule1(BaseImageProcessingModule):
+class TestOperator1(BaseObjectProcessingOperator):
     callback_msg = 'TestModule1 called'
 
-    def _process(self, image: Any, callback: Callable = None, **kwargs) -> Any:
+    def _process(self, ob: int, callback: Callable = None, **kwargs) -> int:
         if callback:
             callback(data=self.callback_msg)
-        return image + 5
+        return ob + 5
 
 
-class TestModule2(BaseImageProcessingModule):
+class TestOperator2(BaseObjectProcessingOperator):
     callback_msg = 'TestModule2 called'
 
-    def _process(self, image: Any, callback: Callable = None, extra_num=0, **kwargs) -> Any:
+    def _process(self, ob: int, callback: Callable = None, extra_num=0, **kwargs) -> int:
         if callback:
             callback(data=self.callback_msg)
-        return image + 6 + extra_num
+        return ob + 6 + extra_num
 
 
-class TestModule3(BaseImageProcessingModule):
+class TestOperator3(BaseObjectProcessingOperator):
     callback_msg = 'TestModule3 called'
 
-    def _process(self, image: Any, callback: Callable = None, extra_num=0, **kwargs) -> Any:
+    def _process(self, ob: int, callback: Callable = None, extra_num=0, **kwargs) -> int:
         if callback:
             callback(data=self.callback_msg)
-        return image + 7 + extra_num
+        return ob + 7 + extra_num
 
 
-class TestModule4(TestModule3):
+class TestModule4(TestOperator3):
 
-    def process(self, image: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
+    def process(self, ob: int, callback: Callable[..., None] = None, **kwargs) -> int:
         raise ValueError('test error')
 
 
-class TestImageProcessingModulesPipeline(ImageProcessingModulesPipeline):
+class TestObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipeline):
     _version = (0, 0, 1, 'alpha', 0)
 
 
 class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
 
     def create_default_test_obj(self):
-        return TestImageProcessingModulesPipeline([])
+        return TestObjectProcessingOperatorsPipeline([])
 
     def test_run_simple(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule2(), TestModule3()])
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestOperator2(), TestOperator3()])
         result = pipeline.run(0)
         self.assertEqual(18, result)
 
     def test_run_unhandled_error(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule4()])
-        with self.assertRaises(EIPPMUnhandledException) as cm:
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestModule4()])
+        with self.assertRaises(ObjectProcessingError) as cm:
             pipeline.run(0)
         self.assertIsInstance(cm.exception.cause, ValueError)
 
     def test_run_processing_error(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule3()])
-        with self.assertRaises(EIPPMUnhandledException) as cm:
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestOperator3()])
+        with self.assertRaises(ObjectProcessingError) as cm:
             pipeline.run(0, call_params={
                 1: {
                     'params': {
@@ -74,12 +74,14 @@ class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
         self.assertIsInstance(cm.exception.cause, TypeError)
 
     def test_run_unhandled_error_ignore(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule4()], ignore_processing_errors=True)
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestModule4()],
+                                                         ignore_processing_errors=True)
         result = pipeline.run(0)
         self.assertEqual(5, result)
 
     def test_run_processing_error_ignore(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule3()], ignore_processing_errors=True)
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestOperator3()],
+                                                         ignore_processing_errors=True)
         result = pipeline.run(0, call_params={
             1: {
                 'params': {
@@ -90,11 +92,11 @@ class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
         self.assertEqual(5, result)
 
     def test_run_call_params(self):
-        m1 = TestModule1()
-        m2 = TestModule2()
-        m3 = TestModule3()
+        m1 = TestOperator1()
+        m2 = TestOperator2()
+        m3 = TestOperator3()
 
-        pipeline = TestImageProcessingModulesPipeline([m1, m2, m3])
+        pipeline = TestObjectProcessingOperatorsPipeline([m1, m2, m3])
 
         call_params = {
             0: {'callback': lambda data: self.assertEqual(m1.callback_msg, data)},
@@ -117,7 +119,7 @@ class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
         self.assertEqual(16, result)
 
         call_params[2]['skip_error'] = False
-        with self.assertRaises(EIPPMUnhandledException) as cm:
+        with self.assertRaises(ObjectProcessingError) as cm:
             pipeline.run(0, call_params=call_params)
 
         self.assertIsInstance(cm.exception.cause, TypeError)
@@ -128,16 +130,16 @@ class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
         self.assertEqual(16, result)
 
     def test_run_call_params_invalid_idx(self):
-        pipeline = TestImageProcessingModulesPipeline([TestModule1(), TestModule3()])
+        pipeline = TestObjectProcessingOperatorsPipeline([TestOperator1(), TestOperator3()])
         result = pipeline.run(0, call_params={325435: {}})
         self.assertEqual(12, result)
 
     def test_pipeline_props(self):
-        m1 = TestModule1(auto_init=False)
-        m2 = TestModule2(auto_init=False)
-        m3 = TestModule3()
+        m1 = TestOperator1(auto_init=False)
+        m2 = TestOperator2(auto_init=False)
+        m3 = TestOperator3()
 
-        pipeline = TestImageProcessingModulesPipeline([m1, m2, m3])
+        pipeline = TestObjectProcessingOperatorsPipeline([m1, m2, m3])
         self.assertFalse(pipeline.is_initialized)
 
         m1.initialize()
@@ -146,14 +148,14 @@ class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
 
         self.assertEqual('0.0.1', pipeline.version)
 
-        self.assertEqual('TestImageProcessingModulesPipeline (0.0.1)', pipeline.full_name)
-        self.assertEqual('TestImageProcessingModulesPipeline', pipeline.short_name)
+        self.assertEqual('TestObjectProcessingOperatorsPipeline (0.0.1)', pipeline.full_name)
+        self.assertEqual('TestObjectProcessingOperatorsPipeline', pipeline.short_name)
 
         with mock.patch('pkg_resources.require') as mock_require:
             res = pipeline.dependencies_satisfied
             self.assertTrue(res)
 
-            m4 = TestModule3(auto_init=False)
+            m4 = TestOperator3(auto_init=False)
             m4._dependencies = self.test_dependencies
 
             pipeline.append(m4)

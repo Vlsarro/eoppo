@@ -1,7 +1,7 @@
 import os
 import pickle
 from unittest import TestCase, mock
-from eippm.exceptions import EIPPMSaveException
+from eoppo.exceptions import OperatorSaveError
 
 
 class EIPPMBaseTestCase(TestCase):
@@ -36,7 +36,7 @@ class EIPPMBaseTestCase(TestCase):
         with mock.patch('pickle.dump') as mock_dump:
             mock_dump.side_effect = [TypeError('err')]
 
-            with self.assertRaises(EIPPMSaveException) as cm:
+            with self.assertRaises(OperatorSaveError) as cm:
                 m.save(self.test_module_filepath)
 
             self.assertIsInstance(cm.exception.cause, TypeError)

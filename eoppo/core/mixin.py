@@ -1,7 +1,7 @@
-from eippm.exceptions import EIPPMSaveException
-from eippm.logger import logger
-from eippm.utils.version import get_version
-from eippm.utils.common import get_exc_data
+from eoppo.exceptions import OperatorSaveError
+from eoppo.logger import logger
+from eoppo.utils.version import get_version
+from eoppo.utils.common import get_exc_data
 
 try:
     import cPickle as pickle
@@ -9,10 +9,10 @@ except:
     import pickle
 
 
-__all__ = ('ImageProcessingModuleMixin',)
+__all__ = ('ObjectProcessingOperatorMixin',)
 
 
-class ImageProcessingModuleMixin:
+class ObjectProcessingOperatorMixin:
     _version = tuple()
 
     @property
@@ -32,8 +32,8 @@ class ImageProcessingModuleMixin:
             with open(filepath, 'wb') as f:
                 pickle.dump(self, f)
         except Exception as e:
-            logger.debug(f'Module saving exception > {repr(e)}\n{get_exc_data()}')
-            raise EIPPMSaveException(cause=e)
+            logger.debug(f'Operator saving exception > {repr(e)}\n{get_exc_data()}')
+            raise OperatorSaveError(cause=e)
         else:
             return self
 

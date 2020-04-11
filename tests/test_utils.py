@@ -1,4 +1,4 @@
-from eippm.utils.version import get_version
+from eoppo.utils.version import get_version
 import unittest
 
 

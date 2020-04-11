@@ -1,12 +1,12 @@
 import os
-from eippm.core.base import BaseImageProcessingModule
-from eippm.core.pipeline import ImageProcessingModulesPipeline
+from eoppo.core.base import BaseObjectProcessingOperator
+from eoppo.core.pipeline import ObjectProcessingOperatorsPipeline
 
 
 EXAMPLES_DIR = os.path.dirname(__file__)
 
 
-class RotationOperator(BaseImageProcessingModule):
+class RotationOperator(BaseObjectProcessingOperator):
 
     # rotation code is from https://codereview.stackexchange.com/a/41903
 
@@ -71,7 +71,7 @@ class RotationOperator(BaseImageProcessingModule):
         return dest
 
 
-class RGB2GrayOperator(BaseImageProcessingModule):
+class RGB2GrayOperator(BaseObjectProcessingOperator):
 
     _dependencies = ('numpy',)
 
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.DEBUG)
 
-    pipeline = ImageProcessingModulesPipeline([RGB2GrayOperator(), RotationOperator()])
+    pipeline = ObjectProcessingOperatorsPipeline([RGB2GrayOperator(), RotationOperator()])
 
     test_img = np.asarray(Image.open(os.path.join(EXAMPLES_DIR, '1.jpg')))
 

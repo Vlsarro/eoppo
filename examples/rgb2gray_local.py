@@ -1,11 +1,11 @@
 import os
-from eippm.core.base import BaseImageProcessingModule
+from eoppo.core.base import BaseObjectProcessingOperator
 
 
 EXAMPLES_DIR = os.path.dirname(__file__)
 
 
-class RGB2Gray(BaseImageProcessingModule):
+class RGB2Gray(BaseObjectProcessingOperator):
 
     _dependencies = ('numpy',)
 

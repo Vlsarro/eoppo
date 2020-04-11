@@ -3,15 +3,15 @@ from typing import Callable
 from unittest import main, mock
 
 from tests import EIPPMBaseTestCase
-from eippm.core.base import BaseImageProcessingModule
-from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
-                              EIPPMDependenciesNotSatisfiedException)
+from eoppo.core.base import BaseObjectProcessingOperator
+from eoppo.exceptions import (InitializationError, ObjectProcessingError, OperatorNotInitializedError,
+                              DependenciesNotSatisfiedError)
 
 
 sample_callback_data = {'a': 5, 'b': 4, 'data': {'a': 5}}
 
 
-class TestImageProcessingModule(BaseImageProcessingModule):
+class TestObjectProcessingOperator(BaseObjectProcessingOperator):
     _version = (0, 0, 1, 'alpha', 0)
 
     def _process(self, image, callback: Callable = None, **kwargs):
@@ -20,10 +20,10 @@ class TestImageProcessingModule(BaseImageProcessingModule):
         return image
 
 
-class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
+class BaseObjectProcessingOperatorTests(EIPPMBaseTestCase):
 
     def create_default_test_obj(self):
-        return TestImageProcessingModule(auto_init=False)
+        return TestObjectProcessingOperator(auto_init=False)
 
     @mock.patch('pkg_resources.require')
     def test_module_initialize(self, mock_require):
@@ -32,7 +32,7 @@ class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
         mock_require.side_effect = [pkg_resources.VersionConflict(), True]
 
-        with self.assertRaises(EIPPMDependenciesNotSatisfiedException):
+        with self.assertRaises(DependenciesNotSatisfiedError):
             m.initialize()
 
         self.assertFalse(m.is_initialized)
@@ -41,7 +41,7 @@ class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
         with mock.patch.object(m, '_initialize') as mock_initialize:
             mock_initialize.side_effect = [ValueError()]
-            with self.assertRaises(EIPPMInitializationException) as cm:
+            with self.assertRaises(InitializationError) as cm:
                 m.initialize()
 
         self.assertIsInstance(cm.exception.cause, ValueError)
@@ -55,7 +55,7 @@ class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
         test_arg = [1, 2, 3]
 
-        with self.assertRaises(EIPPMNotInitializedException):
+        with self.assertRaises(OperatorNotInitializedError):
             m.process(None)
 
         m.initialize()
@@ -65,7 +65,7 @@ class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
             mock_process.side_effect = [ValueError(), sample_result, ValueError()]
 
-            with self.assertRaises(EIPPMUnhandledException) as cm:
+            with self.assertRaises(ObjectProcessingError) as cm:
                 m.process(None)
 
             self.assertIsInstance(cm.exception.cause, ValueError)
@@ -104,8 +104,8 @@ class BaseImageProcessingModuleTests(EIPPMBaseTestCase):
 
         self.assertEqual('0.0.1', m.version)
 
-        self.assertEqual('TestImageProcessingModule (0.0.1)', m.full_name)
-        self.assertEqual('TestImageProcessingModule', m.short_name)
+        self.assertEqual('TestObjectProcessingOperator (0.0.1)', m.full_name)
+        self.assertEqual('TestObjectProcessingOperator', m.short_name)
 
         self.assertFalse(m.is_initialized)
 

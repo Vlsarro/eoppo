@@ -1,18 +1,18 @@
 import pkg_resources
 from copy import deepcopy
 from typing import Callable, Any
-from eippm.logger import logger
-from eippm.core import ImageProcessingModuleABC
-from eippm.core.mixin import ImageProcessingModuleMixin
-from eippm.exceptions import (EIPPMInitializationException, EIPPMUnhandledException, EIPPMNotInitializedException,
-                              EIPPMDependenciesNotSatisfiedException)
-from eippm.utils.common import get_exc_data
+from eoppo.logger import logger
+from eoppo.core import ObjectProcessingOperatorABC
+from eoppo.core.mixin import ObjectProcessingOperatorMixin
+from eoppo.exceptions import (InitializationError, ObjectProcessingError, OperatorNotInitializedError,
+                              DependenciesNotSatisfiedError)
+from eoppo.utils.common import get_exc_data
 
 
-__all__ = ('BaseImageProcessingModule', 'NoopImageProcessingModule')
+__all__ = ('BaseObjectProcessingOperator', 'NoopObjectProcessingOperator')
 
 
-class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleMixin):
+class BaseObjectProcessingOperator(ObjectProcessingOperatorABC, ObjectProcessingOperatorMixin):
     _pkgs = {}  # TODO: make immutable after first assignment
 
     _default_settings = {}
@@ -25,7 +25,7 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
     _initialized = False
     
     def __init__(self, auto_init: bool = True, ignore_processing_errors: bool = False, **kwargs) -> None:
-        super(BaseImageProcessingModule, self).__init__()
+        super(BaseObjectProcessingOperator, self).__init__()
         self.settings = deepcopy(self._default_settings)
         self.ignore_processing_errors = ignore_processing_errors
         if auto_init:
@@ -44,23 +44,23 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
                     return self._initialize(**kwargs)
                 except Exception as e:
                     logger.debug(f'Initialization exception > {repr(e)}\n{get_exc_data()}')
-                    raise EIPPMInitializationException(cause=e)
+                    raise InitializationError(cause=e)
             else:
-                raise EIPPMDependenciesNotSatisfiedException()
+                raise DependenciesNotSatisfiedError()
         return self
 
-    def process(self, image: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
+    def process(self, ob: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
         if not self.is_initialized:
-            raise EIPPMNotInitializedException()
+            raise OperatorNotInitializedError()
 
         try:
-            return self._process(image, callback=callback, **kwargs)
+            return self._process(ob, callback=callback, **kwargs)
         except Exception as e:
             logger.debug(f'Processing exception > {repr(e)}\n{get_exc_data()}')
             if self.ignore_processing_errors:
-                return image
+                return ob
             else:
-                raise EIPPMUnhandledException(cause=e)
+                raise ObjectProcessingError(cause=e)
 
     @property
     def dependencies_satisfied(self) -> bool:
@@ -81,6 +81,6 @@ class BaseImageProcessingModule(ImageProcessingModuleABC, ImageProcessingModuleM
         return self._initialized
 
 
-class NoopImageProcessingModule(BaseImageProcessingModule):
-    def _process(self, image: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
-        return image
+class NoopObjectProcessingOperator(BaseObjectProcessingOperator):
+    def _process(self, ob: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
+        return ob

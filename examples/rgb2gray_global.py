@@ -3,13 +3,13 @@ import logging
 import pickle
 import numpy as np
 from PIL import Image
-from eippm.core.base import BaseImageProcessingModule
+from eoppo.core.base import BaseObjectProcessingOperator
 
 
 EXAMPLES_DIR = os.path.dirname(__file__)
 
 
-class RGB2Gray(BaseImageProcessingModule):
+class RGB2Gray(BaseObjectProcessingOperator):
 
     def _process(self, image, callback=None, **kwargs):
         return np.dot(image[..., :3], [0.2989, 0.5870, 0.1140])

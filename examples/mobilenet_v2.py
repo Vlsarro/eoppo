@@ -1,13 +1,13 @@
 import os
 import logging
-from eippm.core.base import BaseImageProcessingModule
-from eippm.exceptions import EIPPMException
+from eoppo.core.base import BaseObjectProcessingOperator
+from eoppo.exceptions import ObjectOperatorError
 
 
 EXAMPLES_DIR = os.path.dirname(__file__)
 
 
-class MobilenetV2Classifier(BaseImageProcessingModule):
+class MobilenetV2Classifier(BaseObjectProcessingOperator):
 
     _dependencies = ('torch==1.4.0', 'torchvision==0.5.0')
 
@@ -51,12 +51,12 @@ if __name__ == '__main__':
     result = []
 
     try:
-        out = mobilenet_v2_classifier.process(image=test_img, callback=lambda **kwargs: result.append(kwargs))
-    except EIPPMException:
-        logging.error('Error occured', exc_info=True)
+        out = mobilenet_v2_classifier.process(ob=test_img, callback=lambda **kwargs: result.append(kwargs))
+    except ObjectOperatorError:
+        logging.error('Error occurred', exc_info=True)
 
     mobilenet_v2_classifier.ignore_processing_errors = True
-    mobilenet_v2_classifier.process(image=test_img, callback=lambda **kwargs: result.append(kwargs)).show()
+    mobilenet_v2_classifier.process(ob=test_img, callback=lambda **kwargs: result.append(kwargs)).show()
 
     logging.info('Finished!')
     logging.info(result)
