@@ -6,7 +6,6 @@ from eoppo.core import ObjectProcessingOperatorABC
 from eoppo.core.mixin import ObjectProcessingOperatorMixin
 from eoppo.exceptions import (InitializationError, ObjectProcessingError, OperatorNotInitializedError,
                               DependenciesNotSatisfiedError)
-from eoppo.utils.common import get_exc_data
 
 
 __all__ = ('BaseObjectProcessingOperator', 'NoopObjectProcessingOperator')
@@ -43,7 +42,7 @@ class BaseObjectProcessingOperator(ObjectProcessingOperatorABC, ObjectProcessing
                 try:
                     return self._initialize(**kwargs)
                 except Exception as e:
-                    logger.debug(f'Initialization exception > {repr(e)}\n{get_exc_data()}')
+                    logger.debug(f'Operator initialization exception > {e!r}', exc_info=True)
                     raise InitializationError(cause=e)
             else:
                 raise DependenciesNotSatisfiedError()
@@ -56,7 +55,7 @@ class BaseObjectProcessingOperator(ObjectProcessingOperatorABC, ObjectProcessing
         try:
             return self._process(ob, callback=callback, **kwargs)
         except Exception as e:
-            logger.debug(f'Processing exception > {repr(e)}\n{get_exc_data()}')
+            logger.debug(f'Object processing exception > {e!r}', exc_info=True)
             if self.ignore_processing_errors:
                 return ob
             else:
@@ -70,7 +69,7 @@ class BaseObjectProcessingOperator(ObjectProcessingOperatorABC, ObjectProcessing
                 try:
                     pkg_resources.require(self._dependencies)
                 except (pkg_resources.DistributionNotFound, pkg_resources.VersionConflict) as e:
-                    logger.debug(f'Dependencies are not satisfied > {repr(e)}\n{get_exc_data()}')
+                    logger.debug(f'Operator dependencies are not satisfied > {e!r}', exc_info=True)
                     self._dependencies_satisfied = False
                 finally:
                     return self._dependencies_satisfied

@@ -5,7 +5,6 @@ from eoppo.core.base import BaseObjectProcessingOperator
 from eoppo.core.mixin import ObjectProcessingOperatorMixin
 from eoppo.exceptions import ObjectOperatorError, ObjectProcessingError, NoOperatorsInPipelineError
 from eoppo.logger import logger
-from eoppo.utils.common import get_exc_data
 
 
 __all__ = ('ObjectProcessingOperatorsPipeline',)
@@ -46,7 +45,7 @@ class ObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipelineABC, Ob
             else:
                 raise
         except Exception as e:
-            logger.debug(f'Pipeline processing exception > {repr(e)}\n{get_exc_data()}')
+            logger.debug(f'Pipeline processing exception > {e!r}', exc_info=True)
             if self.ignore_processing_errors:
                 return ob
             else:
@@ -69,7 +68,7 @@ class ObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipelineABC, Ob
     @staticmethod
     def _check_item_type(v):
         if not isinstance(v, ObjectProcessingOperatorABC):
-            raise TypeError(f'{repr(v)} is not a subclass of {repr(ObjectProcessingOperatorABC)}')
+            raise TypeError(f'{v!r} is not a subclass of {ObjectProcessingOperatorABC!r}')
 
     def __len__(self): return len(self._operators)
 

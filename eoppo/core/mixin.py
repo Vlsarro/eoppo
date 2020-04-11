@@ -1,7 +1,6 @@
 from eoppo.exceptions import OperatorSaveError
 from eoppo.logger import logger
 from eoppo.utils.version import get_version
-from eoppo.utils.common import get_exc_data
 
 try:
     import cPickle as pickle
@@ -32,7 +31,7 @@ class ObjectProcessingOperatorMixin:
             with open(filepath, 'wb') as f:
                 pickle.dump(self, f)
         except Exception as e:
-            logger.debug(f'Operator saving exception > {repr(e)}\n{get_exc_data()}')
+            logger.debug(f'Operator saving exception > {e!r}', exc_info=True)
             raise OperatorSaveError(cause=e)
         else:
             return self
