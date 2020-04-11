@@ -14,19 +14,25 @@ Following operator calculates the sum of integers and multiplies them by provide
 
 ```python
 from typing import Callable, List
+
 from eoppo.core.base import BaseObjectProcessingOperator
+from eoppo.exceptions import ObjectProcessingError
 
 
 class SumMultiplyOperator(BaseObjectProcessingOperator):
-    
-    def _process(self, ob: List[int], callback: Callable=None, m_factor=1, **kwargs) -> int:
+
+    def _process(self, ob: List[int], callback: Callable[..., None] = None, m_factor=1, **kwargs) -> int:
+        if callback:
+            callback(data=len(ob))
         return sum(ob) * m_factor
 
 
 if __name__ == '__main__':
     op = SumMultiplyOperator()
-    result = op.process([1, 2, 3, 4], m_factor=2)
-
+    try:
+        result = op.process([1, 2, 3, 4], m_factor=2, callback=lambda **kw: print(kw))
+    except ObjectProcessingError:
+        result = 0
 ```
 
 For more practical examples you can take a look at `/examples` folder. At first this library was related solely to image processing, so examples are also associated with this area.
