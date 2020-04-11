@@ -9,11 +9,11 @@ __all__ = ('ObjectProcessingOperatorABC', 'ObjectProcessingOperatorsPipelineABC'
 class ObjectProcessingOperatorABC(ABC):
 
     @abstractmethod
-    def _process(self, ob: Any, callback: Callable = None, **kwargs) -> Any:
+    def _process(self, ob: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
         pass
 
     @abstractmethod
-    def process(self, ob: Any, callback: Callable = None, **kwargs) -> Any:
+    def process(self, ob: Any, callback: Callable[..., None] = None, **kwargs) -> Any:
         pass
 
     @abstractmethod
