@@ -1,6 +1,6 @@
 import pkg_resources
 from copy import deepcopy
-from typing import Callable, Any
+from typing import Any, Callable, Tuple
 from eoppo.logger import logger
 from eoppo.core import ObjectProcessingOperatorABC
 from eoppo.core.mixin import ObjectProcessingOperatorMixin
@@ -16,7 +16,7 @@ class BaseObjectProcessingOperator(ObjectProcessingOperatorABC, ObjectProcessing
     _pkgs = {}  # TODO: make immutable after first assignment
 
     _default_settings = {}
-    _dependencies = tuple()
+    _dependencies = tuple()  # type: Tuple[str]
 
     _dependencies_satisfied = None
 

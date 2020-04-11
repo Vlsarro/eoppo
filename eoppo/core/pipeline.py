@@ -1,6 +1,6 @@
-from typing import Any, List, Dict, TypedDict, Callable, Tuple, Union
+from typing import Any, List, Dict
 
-from eoppo.core import ObjectProcessingOperatorsPipelineABC, ObjectProcessingOperatorABC
+from eoppo.core import ObjectProcessingOperatorsPipelineABC, ObjectProcessingOperatorABC, OperatorCallParams
 from eoppo.core.base import BaseObjectProcessingOperator
 from eoppo.core.mixin import ObjectProcessingOperatorMixin
 from eoppo.exceptions import ObjectOperatorError, ObjectProcessingError, NoOperatorsInPipelineError
@@ -9,13 +9,6 @@ from eoppo.utils.common import get_exc_data
 
 
 __all__ = ('ObjectProcessingOperatorsPipeline',)
-
-
-class ModuleCallParams(TypedDict):
-    callback: Callable[..., None]
-    params: Dict
-    exc_to_ignore: Union[type, Tuple[Exception]]
-    skip_error: bool
 
 
 class ObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipelineABC, ObjectProcessingOperatorMixin):
@@ -28,7 +21,7 @@ class ObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipelineABC, Ob
         if modules:
             self.extend(modules)
 
-    def run(self, ob: Any, call_params: Dict[int, ModuleCallParams] = None) -> Any:
+    def run(self, ob: Any, call_params: Dict[int, OperatorCallParams] = None) -> Any:
         if not self._operators:
             raise NoOperatorsInPipelineError()
 
