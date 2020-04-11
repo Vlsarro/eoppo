@@ -4,15 +4,15 @@ from unittest import TestCase, mock
 from eoppo.exceptions import OperatorSaveError
 
 
-class EIPPMBaseTestCase(TestCase):
+class EOPPOBaseTestCase(TestCase):
 
     def setUp(self) -> None:
-        super(EIPPMBaseTestCase, self).setUp()
+        super(EOPPOBaseTestCase, self).setUp()
         self.test_module_filepath = os.path.join(os.path.dirname(__file__), 'test_module')
         self.test_dependencies = ('numpy', 'pillow')
 
     def tearDown(self) -> None:
-        super(EIPPMBaseTestCase, self).tearDown()
+        super(EOPPOBaseTestCase, self).tearDown()
         self._remove_saved_module()
 
     def _remove_saved_module(self):

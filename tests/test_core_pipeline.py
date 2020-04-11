@@ -2,7 +2,7 @@ import pkg_resources
 from unittest import mock, main
 from typing import Callable
 
-from tests import EIPPMBaseTestCase
+from tests import EOPPOBaseTestCase
 from eoppo.core.base import BaseObjectProcessingOperator
 from eoppo.core.pipeline import ObjectProcessingOperatorsPipeline
 from eoppo.exceptions import ObjectProcessingError
@@ -45,7 +45,7 @@ class TestObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipeline):
     _version = (0, 0, 1, 'alpha', 0)
 
 
-class ImageProcessingModulesPipelineTests(EIPPMBaseTestCase):
+class ImageProcessingModulesPipelineTests(EOPPOBaseTestCase):
 
     def create_default_test_obj(self):
         return TestObjectProcessingOperatorsPipeline([])

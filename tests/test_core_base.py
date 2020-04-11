@@ -2,7 +2,7 @@ import pkg_resources
 from typing import Callable
 from unittest import main, mock
 
-from tests import EIPPMBaseTestCase
+from tests import EOPPOBaseTestCase
 from eoppo.core.base import BaseObjectProcessingOperator
 from eoppo.exceptions import (InitializationError, ObjectProcessingError, OperatorNotInitializedError,
                               DependenciesNotSatisfiedError)
@@ -20,7 +20,7 @@ class TestObjectProcessingOperator(BaseObjectProcessingOperator):
         return image
 
 
-class BaseObjectProcessingOperatorTests(EIPPMBaseTestCase):
+class BaseObjectProcessingOperatorTests(EOPPOBaseTestCase):
 
     def create_default_test_obj(self):
         return TestObjectProcessingOperator(auto_init=False)
