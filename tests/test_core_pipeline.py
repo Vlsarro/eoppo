@@ -45,7 +45,7 @@ class TestObjectProcessingOperatorsPipeline(ObjectProcessingOperatorsPipeline):
     _version = (0, 0, 1, 'alpha', 0)
 
 
-class ImageProcessingModulesPipelineTests(EOPPOBaseTestCase):
+class ObjectProcessingOperatorsPipelineTests(EOPPOBaseTestCase):
 
     def create_default_test_obj(self):
         return TestObjectProcessingOperatorsPipeline([])

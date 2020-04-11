@@ -14,10 +14,10 @@ sample_callback_data = {'a': 5, 'b': 4, 'data': {'a': 5}}
 class TestObjectProcessingOperator(BaseObjectProcessingOperator):
     _version = (0, 0, 1, 'alpha', 0)
 
-    def _process(self, image, callback: Callable = None, **kwargs):
+    def _process(self, ob, callback: Callable = None, **kwargs):
         if callback:
             callback(**sample_callback_data)
-        return image
+        return ob
 
 
 class BaseObjectProcessingOperatorTests(EOPPOBaseTestCase):
