@@ -17,11 +17,11 @@ class ObjectProcessingOperatorABC(ABC):
         pass
 
     @abstractmethod
-    def _initialize(self, **kwargs) -> None:
+    def _initialize(self, **kwargs) -> __qualname__:
         pass
 
     @abstractmethod
-    def initialize(self, **kwargs) -> None:
+    def initialize(self, **kwargs) -> __qualname__:
         pass
 
 
