@@ -21,13 +21,14 @@ class RGB2Gray(BaseObjectProcessingOperator):
 
 if __name__ == '__main__':
     import logging
-    import pickle
-    import numpy as np
-    from PIL import Image
 
     logging.basicConfig(level=logging.DEBUG)
 
     rgb2gray = RGB2Gray()
+
+    import pickle
+    import numpy as np
+    from PIL import Image
 
     img_processing_module_filepath = os.path.join(EXAMPLES_DIR, 'rbg2gray')
 
