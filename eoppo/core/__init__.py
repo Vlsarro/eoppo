@@ -1,6 +1,13 @@
+import sys
+
 from abc import ABC, abstractmethod
 from collections import MutableSequence
-from typing import Any, Callable, Dict, TypedDict, Tuple, Union
+from typing import Any, Callable, Dict, Tuple, Union
+
+if sys.version_info[0] == 3 and sys.version_info[1] >= 8:
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
 
 __all__ = ('ObjectProcessingOperatorABC', 'ObjectProcessingOperatorsPipelineABC', 'OperatorCallParams')
